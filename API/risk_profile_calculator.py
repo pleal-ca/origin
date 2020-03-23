@@ -1,57 +1,64 @@
 from datetime import date
 
-def calculator(customer):
+def riskcalculator(personal_info):
+#   Começamos calculando o risco base, somando os risk_scoreados das questões binárias e            #
+#   colocando o valor num dict de score de risco com os tipos de seguro a serem perfilados.         #
 
-    baserisk = sum(customer['risk_questions'])
+    baserisk = sum(personal_info['risk_questions'])
 
-    if customer['age'] < 30:
+    if personal_info['age'] < 30:
         baserisk -= 2
-    if customer['age'] >= 30 and customer['age'] <= 40:
+    if personal_info['age'] >= 30 and personal_info['age'] <= 40:
         baserisk -= 1
-    if customer['income'] > 200000:
+    if personal_info['income'] > 200000:
         baserisk -= 1
 
-    result = {'life':baserisk,'disability':baserisk,'home':baserisk,'auto':baserisk}
+    risk_score = {'life':baserisk,'disability':baserisk,'home':baserisk,'auto':baserisk}
 
-    if customer['house'] == 'mortgaged':
-        result['home'] += 1
-        result['disability'] -= 1
+#   Com o dicionário definido, aplicamos todas as regras de cálculo definidas no assignment.          #
 
-    if customer['dependents'] >= 1:
-        result['disability'] += 1
-        result['life'] += 1
+    if personal_info['house'] == 'mortgaged':
+        risk_score['home'] += 1
+        risk_score['disability'] -= 1
 
-    if customer['marital_status'] == 'married':
-        result['life'] += 1
-        result['disability'] -= 1
+    if personal_info['dependents'] >= 1:
+        risk_score['disability'] += 1
+        risk_score['life'] += 1
 
-    if customer['vehicle'] != None:
+    if personal_info['marital_status'] == 'married':
+        risk_score['life'] += 1
+        risk_score['disability'] -= 1
+
+    if personal_info['vehicle'] != None:
         current_year = date.today().year
-        if customer['vehicle']['year'] >= current_year - 5:
-            result['auto'] += 1
+        if personal_info['vehicle']['year'] >= current_year - 5:
+            risk_score['auto'] += 1
 
-    if customer['age'] > 60:
-        result['disability'] = None
-        result['life'] = None
+#   Aqui, aplicamos as regras de inelegibilidade para seguro definidas no assignment.               #
 
-    if customer['income'] == 0 or customer['income'] == None:
-        result['disability'] = None
+    if personal_info['age'] > 60:
+        risk_score['disability'] = None
+        risk_score['life'] = None
 
-    if customer['house'] == None:
-        result['home'] = None
+    if personal_info['income'] == 0 or personal_info['income'] == None:
+        risk_score['disability'] = None
 
-    if customer['vehicle'] == None:
-        result['auto'] = None
+    if personal_info['house'] == None:
+        risk_score['home'] = None
 
+    if personal_info['vehicle'] == None:
+        risk_score['auto'] = None
 
-    for key, value in result.items():
-        if result[key] == None:
-            result[key] = 'Ineligible'
-        elif result[key] <= 0:
-            result[key] = 'Economic'
-        elif result[key] > 0 and result[key] < 3:
-            result[key] = 'Regular'
+#   Por fim, transformamos os valores numéricos do dict de score de risco em texto para o retorno  #
+
+    for key, value in risk_score.items():
+        if risk_score[key] == None:
+            risk_score[key] = 'Ineligible'
+        elif risk_score[key] <= 0:
+            risk_score[key] = 'Economic'
+        elif risk_score[key] > 0 and risk_score[key] < 3:
+            risk_score[key] = 'Regular'
         else:
-            result[key] = 'Responsible'
+            risk_score[key] = 'Responsible'
 
-    return result
+    return risk_score
